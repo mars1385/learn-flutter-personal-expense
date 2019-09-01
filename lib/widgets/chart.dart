@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../models/transaction.dart';
+import './chart_bar.dart';
 
 class Chart extends StatelessWidget {
   //props
@@ -25,14 +26,34 @@ class Chart extends StatelessWidget {
         }
       }
       return {
-        'day': DateFormat.E(weekDay),
+        'day': DateFormat.E().format(weekDay),
         'amount': totalAmount,
       };
     });
   }
 
+  //total amount
+  double get totalSpending {
+    return groupTransactionsValue.fold(0.0, (sum, item) {
+      return sum + item['amount'];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Card(
+      elevation: 6,
+      margin: EdgeInsets.all(20),
+      child: Row(
+        children: groupTransactionsValue.map((data) {
+          return ChartBar(
+              data['day'],
+              data['amount'],
+              totalSpending == 0.0
+                  ? 0.0
+                  : (data['amount'] as double) / totalSpending);
+        }).toList(),
+      ),
+    );
   }
 }
